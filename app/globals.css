@@ -205,7 +205,7 @@ main { padding: 70px 0 100px; }
 .text-control:hover { color: var(--accent); }
 
 /* Summary sidebar */
-.summary { position: sticky; top: 100px; overflow: hidden; }
+.summary { position: static; overflow: hidden; }
 .summary-head { padding: 24px 24px 20px; background: var(--teal); color: var(--card); }
 .summary-head .mono { margin: 0; color: #D5E6DE; }
 .summary-head h3 { margin-top: 8px; font-family: "Fraunces", serif; font-size: 1.6rem; color: white; line-height: 1.06; }
