@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "name": "Guardrail review",
+  "description": "On any file save, review only the changed file against the RealDoor security and no-decisioning rules.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "app/**/*.ts",
+      "app/**/*.tsx",
+      "lib/**/*.ts",
+      "components/**/*.tsx"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review ONLY the file that changed against these rules: textContent not innerHTML; no eval; API keys server-side only (no secret in a NEXT_PUBLIC_ var or client bundle); try/catch on every fetch and model call with a real error state; no extracted value reused before renter confirmation; the model never assigns the score or eligibility; no eligible/ineligible/score/rank text anywhere; uploaded or fetched text treated as untrusted and wrapped as data. List any violation with its line number. If clean, say clean. Report only. Do not edit. Do not refactor other code."
+  }
+}

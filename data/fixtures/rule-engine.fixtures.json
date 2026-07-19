@@ -1,0 +1,88 @@
+{
+  "description": "The rule engine must reproduce these outputs EXACTLY. Test-first anchor.",
+  "cases": [
+    {
+      "name": "baseline annualization",
+      "input": {
+        "monthlyIncomeConfirmed": 3240,
+        "householdSize": 3,
+        "limits": {
+          "program": "Harbor View Homes - LIHTC",
+          "ruleYear": 2026,
+          "effectiveDate": "2026-04-01",
+          "householdSize": 3,
+          "annualLimit": 74280
+        }
+      },
+      "expected": {
+        "annualizedIncome": 38880,
+        "applicableLimit": 74280,
+        "differenceToLimit": 35400,
+        "formula": "monthly gross income x 12",
+        "effectiveDate": "2026-04-01",
+        "source": "Harbor View Homes - LIHTC income limits (2026)"
+      }
+    },
+    {
+      "name": "income above the limit (still neutral, no verdict)",
+      "input": {
+        "monthlyIncomeConfirmed": 6500,
+        "householdSize": 3,
+        "limits": {
+          "program": "Harbor View Homes - LIHTC",
+          "ruleYear": 2026,
+          "effectiveDate": "2026-04-01",
+          "householdSize": 3,
+          "annualLimit": 74280
+        }
+      },
+      "expected": {
+        "annualizedIncome": 78000,
+        "applicableLimit": 74280,
+        "differenceToLimit": -3720,
+        "formula": "monthly gross income x 12",
+        "effectiveDate": "2026-04-01",
+        "source": "Harbor View Homes - LIHTC income limits (2026)"
+      }
+    },
+    {
+      "name": "cents rounding",
+      "input": {
+        "monthlyIncomeConfirmed": 3240.555,
+        "householdSize": 3,
+        "limits": {
+          "program": "Harbor View Homes - LIHTC",
+          "ruleYear": 2026,
+          "effectiveDate": "2026-04-01",
+          "householdSize": 3,
+          "annualLimit": 74280
+        }
+      },
+      "expected": {
+        "annualizedIncome": 38886.66,
+        "applicableLimit": 74280,
+        "differenceToLimit": 35393.34,
+        "formula": "monthly gross income x 12",
+        "effectiveDate": "2026-04-01",
+        "source": "Harbor View Homes - LIHTC income limits (2026)"
+      }
+    }
+  ],
+  "errorCases": [
+    {
+      "name": "household size mismatch throws (never guess a limit row)",
+      "input": {
+        "monthlyIncomeConfirmed": 3240,
+        "householdSize": 4,
+        "limits": {
+          "program": "Harbor View Homes - LIHTC",
+          "ruleYear": 2026,
+          "effectiveDate": "2026-04-01",
+          "householdSize": 3,
+          "annualLimit": 74280
+        }
+      },
+      "expectThrow": true
+    }
+  ]
+}

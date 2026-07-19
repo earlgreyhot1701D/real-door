@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RealDoor extraction output",
+  "description": "Allowlisted fields only. Anything not listed here is discarded, never returned to the client. Every field carries a source and confidence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fields"],
+  "properties": {
+    "documentName": { "type": "string" },
+    "fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "value", "source", "confidence"],
+        "properties": {
+          "id": { "type": "string", "enum": ["monthlyIncome", "householdSize", "payFrequency", "benefitAmount"] },
+          "label": { "type": "string" },
+          "value": { "type": ["number", "string"] },
+          "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["document", "quote", "coordinate"],
+            "properties": {
+              "document": { "type": "string" },
+              "quote": { "type": "string" },
+              "coordinate": { "type": "string" }
+            }
+          },
+          "confidence": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "percent"],
+            "properties": {
+              "label": { "type": "string", "enum": ["High", "Medium", "Low"] },
+              "percent": { "type": "number", "minimum": 0, "maximum": 100 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

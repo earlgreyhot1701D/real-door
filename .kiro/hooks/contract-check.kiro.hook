@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "name": "Contract check",
+  "description": "On save of extraction code or the schema, confirm extractor output still matches the schema and types.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "lib/extraction/**/*.ts",
+      "data/schemas/*.json"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Check that the extractor output still validates against data/schemas/extraction.schema.json and matches the field types. Flag any field that drifted, was added outside the allowlist, or lost its source box or confidence. Report only. Do not change the schema or the code."
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "name": "Test gate",
+  "description": "On save of the rule engine or any test, run the suite. The rule engine must reproduce fixtures exactly.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "lib/rule-engine/**/*.ts",
+      "**/*.test.ts"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Run the test suite. If any test fails, list the failing test names and the exact assertion that broke. The rule engine must reproduce data/fixtures/rule-engine.fixtures.json exactly. Report pass or fail only. Do not edit code. Do not refactor."
+  }
+}

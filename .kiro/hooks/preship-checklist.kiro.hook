@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "name": "Pre-ship checklist (manual)",
+  "description": "Run by hand before submitting. Walks the pre-deploy checklist and reports pass or fail per item.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered",
+    "buttonText": "Run pre-ship checklist"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Walk the pre-deploy checklist in .kiro/steering/security.md against the current code and report each item pass or fail with a one-line reason: authorization/route origin scoping; input validation client and server; CORS locked to origin; rate limiting on model-backed routes; frontend error handling with no blank screens; structured logging that never stores raw document contents; prompt-injection protection proven by a test; refusal on decide-for-me requests; session deletion clears state and announces; no eligible/ineligible/score/rank anywhere; rollback plan present in DEPLOY.md. Report only. Do not fix anything."
+  }
+}

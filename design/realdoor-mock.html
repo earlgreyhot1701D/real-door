@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="RealDoor renter controlled housing readiness profile prototype.">
+  <title>RealDoor | Your information, confirmed by you</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --paper:#F5F1E8;
+      --paper2:#ECE6D8;
+      --card:#FBF8F1;
+      --ink:#1C2B33;
+      --teal:#1F5C5A;
+      --teal2:#2E7A76;
+      --accent:#C2703D;
+      --good:#2E6E4E;
+      --warn:#B5852A;
+      --muted:#6C7680;
+      --line:#DED6C6;
+      --shadow:0 18px 48px rgba(28,43,51,.08);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:var(--paper);
+      color:var(--ink);
+      font-family:"Inter",sans-serif;
+      font-size:16px;
+      line-height:1.6;
+    }
+    button,input{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit}
+    :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+    [hidden]{display:none!important}
+
+    .skip-link{
+      position:fixed;
+      z-index:100;
+      top:12px;
+      left:12px;
+      transform:translateY(-160%);
+      padding:10px 14px;
+      border-radius:8px;
+      background:var(--ink);
+      color:white;
+    }
+    .skip-link:focus{transform:none}
+    .shell{width:min(1180px,calc(100% - 40px));margin-inline:auto}
+    .mono{
+      font-family:"IBM Plex Mono",monospace;
+      font-size:.7rem;
+      font-weight:500;
+      letter-spacing:.09em;
+      line-height:1.45;
+      text-transform:uppercase;
+    }
+    .eyebrow{margin:0 0 14px;color:var(--teal);display:flex;align-items:center;gap:10px}
+    .eyebrow::before{content:"";width:28px;height:2px;background:var(--accent)}
+
+    .site-header{position:sticky;z-index:20;top:0;border-bottom:1px solid var(--line);background:rgba(245,241,232,.96);box-shadow:0 3px 18px rgba(28,43,51,.04)}
+    .nav{
+      min-height:78px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:24px;
+    }
+    .brand{display:flex;align-items:center;gap:13px;text-decoration:none}
+    .door-mark{
+      position:relative;
+      width:28px;
+      height:34px;
+      border:2px solid var(--teal);
+      border-bottom:0;
+      border-radius:14px 14px 0 0;
+    }
+    .door-mark::before{content:"";position:absolute;inset:6px 5px 0;border:2px solid var(--accent);border-bottom:0;border-radius:9px 9px 0 0}
+    .door-mark::after{content:"";position:absolute;right:7px;top:20px;width:3px;height:3px;border-radius:50%;background:var(--accent)}
+    .brand-name{font-family:"Fraunces",serif;font-size:1.45rem;font-weight:700;letter-spacing:-.02em}
+    .promise{margin:0;color:var(--muted);font-size:.82rem}
+    .delete-session{
+      min-height:44px;
+      padding:10px 14px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:transparent;
+      color:var(--ink);
+      font-size:.8rem;
+      font-weight:700;
+    }
+    .delete-session:hover{border-color:var(--accent);color:var(--accent);background:var(--card)}
+    .status-strip{padding:10px 20px;background:var(--teal);color:var(--card);text-align:center}
+
+    .hero{
+      position:relative;
+      display:grid;
+      grid-template-columns:minmax(0,1.05fr) minmax(340px,.72fr);
+      gap:72px;
+      align-items:center;
+      padding:70px 0 58px;
+    }
+    .hero::after{
+      content:"";
+      position:absolute;
+      right:4%;
+      bottom:0;
+      width:120px;
+      height:155px;
+      border:1px solid rgba(31,92,90,.14);
+      border-bottom:0;
+      border-radius:60px 60px 0 0;
+      pointer-events:none;
+    }
+    h1,h2,h3{font-family:"Fraunces",serif;color:var(--teal);line-height:1.06}
+    h1{max-width:720px;margin:0;font-size:clamp(3.15rem,6.7vw,5.55rem);letter-spacing:-.055em}
+    h1 em{display:block;color:var(--accent);font-weight:600}
+    .lede{max-width:650px;margin:24px 0 0;font-size:1.08rem;color:#3F4D53}
+    .reassurance{margin:28px 0 0;font-family:"Fraunces",serif;font-size:1.14rem;font-style:italic;font-weight:600;color:var(--teal)}
+
+    .principles{
+      position:relative;
+      z-index:1;
+      padding:28px;
+      border:1px solid var(--line);
+      border-top:4px solid var(--accent);
+      border-radius:8px;
+      background:var(--card);
+      box-shadow:var(--shadow);
+    }
+    .principles h2{margin:10px 0 20px;font-size:1.75rem}
+    .principle{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+    .principle:first-of-type{border-top:0}
+    .principle-icon{color:var(--accent);font-size:1.1rem}
+    .principle b{display:block;color:var(--ink);font-size:.92rem}
+    .principle span{display:block;margin-top:2px;color:var(--muted);font-size:.82rem;line-height:1.45}
+
+    .progress-wrap{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--card)}
+    .progress{display:grid;grid-template-columns:repeat(4,1fr);padding:0;margin:0;list-style:none}
+    .progress button{
+      width:100%;
+      min-height:82px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      border:0;
+      border-left:1px solid var(--line);
+      background:transparent;
+      color:var(--muted);
+    }
+    .progress li:first-child button{border-left:0}
+    .progress button:hover{background:var(--paper2);color:var(--ink)}
+    .progress .step-number{font-family:"IBM Plex Mono",monospace;font-size:.68rem}
+    .progress .step-label{font-weight:700}
+    .progress [aria-current="step"]{background:var(--paper2);color:var(--teal);box-shadow:inset 0 -4px 0 var(--accent)}
+    .progress [aria-current="step"] .step-label::after{content:" · Current";font-size:.76rem;color:var(--accent)}
+
+    main{padding:70px 0 100px}
+    .stage-heading{display:grid;grid-template-columns:140px minmax(0,1fr);gap:28px;align-items:start;margin-bottom:34px}
+    .stage-heading h2{margin:0 0 14px;font-size:clamp(2.4rem,4.5vw,3.85rem);letter-spacing:-.035em}
+    .stage-heading p:not(.mono){max-width:690px;margin:0;color:var(--muted);font-size:1rem}
+    .stage-index{padding-top:10px;color:var(--accent)}
+
+    .workspace{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.55fr);gap:24px;align-items:start}
+    .panel{border:1px solid var(--line);border-radius:8px;background:var(--card);box-shadow:0 12px 36px rgba(28,43,51,.045)}
+    .upload-panel{padding:30px}
+    .panel-kicker{margin:0 0 8px;color:var(--teal)}
+    .upload-panel h3,.summary h3{margin:0;font-size:1.6rem}
+    .upload-copy{margin:8px 0 22px;color:var(--muted);font-size:.92rem}
+    .upload-zone{
+      min-height:188px;
+      display:grid;
+      place-items:center;
+      padding:30px;
+      border:1.5px dashed var(--teal2);
+      border-radius:8px;
+      background:var(--paper);
+      text-align:center;
+      transition:background .18s ease,border-color .18s ease;
+    }
+    .upload-zone.is-dragging{background:var(--paper2);border-color:var(--accent)}
+    .key-glyph{display:inline-block;margin-bottom:12px;color:var(--accent);font-size:1.8rem;transform:rotate(-12deg)}
+    .upload-zone p{margin:0 0 16px;color:var(--ink);font-weight:600}
+    .upload-zone small{display:block;margin-top:12px;color:var(--muted)}
+    .upload-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+    .primary,.secondary,.text-control{
+      min-height:44px;
+      border-radius:8px;
+      font-weight:700;
+    }
+    .primary{padding:11px 18px;border:1px solid var(--accent);background:var(--accent);color:white}
+    .primary:hover{background:#A85E32}
+    .secondary{padding:11px 18px;border:1px solid var(--teal);background:transparent;color:var(--teal)}
+    .secondary:hover{background:var(--paper2)}
+    .text-control{padding:8px 4px;border:0;background:transparent;color:var(--teal);text-decoration:underline;text-underline-offset:4px}
+    .text-control:hover{color:var(--accent)}
+    input[type="file"]{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;clip-path:inset(50%)}
+
+    .summary{position:sticky;top:20px;overflow:hidden}
+    .summary-head{padding:24px 24px 20px;background:var(--teal);color:var(--card)}
+    .summary-head .mono{margin:0;color:#D5E6DE}
+    .summary-head h3{margin-top:8px;color:white}
+    .summary-body{padding:22px 24px}
+    .summary-row{display:flex;justify-content:space-between;gap:20px;padding:12px 0;border-bottom:1px solid var(--line)}
+    .summary-row span{color:var(--muted);font-size:.84rem}
+    .summary-row strong{text-align:right;font-size:.9rem}
+    .annual{margin:18px 0 0;padding:18px;border-radius:8px;background:var(--paper2)}
+    .annual .mono{display:block;color:var(--teal)}
+    .annual output{display:block;margin-top:3px;font-family:"Fraunces",serif;font-size:2rem;font-weight:700;color:var(--teal)}
+    .annual small{display:block;margin-top:4px;color:var(--muted)}
+    .summary-note{margin:16px 0 0;color:var(--muted);font-size:.8rem}
+
+    .extraction{grid-column:1 / -1;overflow:hidden;margin-top:2px}
+    .extraction-banner{display:flex;align-items:center;gap:12px;padding:15px 24px;background:var(--paper2);border-bottom:1px solid var(--line);color:var(--teal);font-weight:700}
+    .extraction-banner span:first-child{color:var(--accent)}
+    .extraction-head{display:flex;justify-content:space-between;gap:24px;padding:28px 30px 22px}
+    .extraction-head h3{margin:0;font-size:1.75rem}
+    .document-tag{align-self:start;padding:7px 9px;border:1px solid var(--line);border-radius:8px;color:var(--muted);white-space:nowrap}
+    .field-card{margin:0 30px 30px;padding:28px;border:1px solid var(--line);border-left:5px solid var(--teal);border-radius:8px;background:var(--paper)}
+    .field-top{display:flex;justify-content:space-between;gap:20px;align-items:start;margin-bottom:18px}
+    .field-label{display:block;margin-bottom:7px;color:var(--teal)}
+    .field-input-wrap{position:relative;max-width:410px}
+    .currency{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700}
+    .field-input{width:100%;min-height:52px;padding:10px 14px 10px 30px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font-size:1.08rem;font-weight:700}
+    .field-state{display:flex;align-items:center;gap:8px;margin:3px 0 0;color:var(--muted);font-size:.8rem;font-weight:700}
+    .field-state.is-confirmed{color:var(--good)}
+    .field-state-icon{font-size:1rem}
+    .evidence-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(230px,.7fr);gap:18px;margin-top:22px}
+    .source-box,.confidence{padding:17px 18px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+    .source-box .mono,.confidence .mono{display:block;margin-bottom:9px;color:var(--muted)}
+    .source-box q{display:block;color:var(--ink);font-family:"Fraunces",serif;font-size:1.08rem;font-style:italic;font-weight:600;line-height:1.45}
+    .source-coordinate{display:block;margin-top:9px;color:var(--muted)}
+    .confidence-line{display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;font-size:.86rem}
+    .confidence-line strong{color:var(--teal)}
+    .confidence-track{height:7px;overflow:hidden;border-radius:99px;background:var(--paper2)}
+    .confidence-fill{display:block;width:94%;height:100%;background:var(--teal2)}
+    .confidence small{display:block;margin-top:10px;color:var(--muted);line-height:1.45}
+    .field-actions{display:flex;align-items:center;justify-content:flex-end;gap:14px;margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+    .error{margin:8px 0 0;color:#873F2B;font-size:.82rem;font-weight:700}
+
+    .checkpoint{margin:32px 0 0;padding:18px 22px;border-left:3px solid var(--accent);background:var(--paper2);color:var(--muted);font-size:.88rem}
+    .checkpoint strong{color:var(--ink)}
+    .live-region{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;clip-path:inset(50%)}
+
+    @media (max-width:900px){
+      .hero{grid-template-columns:1fr;gap:40px;padding-top:54px}
+      .hero::after{display:none}
+      .workspace{grid-template-columns:1fr}
+      .summary{position:static}
+      .evidence-grid{grid-template-columns:1fr}
+      .stage-heading{grid-template-columns:1fr;gap:6px}
+      .stage-index{padding-top:0}
+    }
+    @media (max-width:680px){
+      .shell{width:min(100% - 24px,1180px)}
+      .nav{align-items:flex-start;padding:16px 0}
+      .brand-copy .promise{display:none}
+      .status-strip{font-size:.6rem}
+      h1{font-size:clamp(2.75rem,15vw,4rem)}
+      .progress{grid-template-columns:repeat(2,1fr)}
+      .progress li:nth-child(3) button{border-left:0;border-top:1px solid var(--line)}
+      .progress li:nth-child(4) button{border-top:1px solid var(--line)}
+      .progress button{min-height:66px;gap:7px}
+      .progress .step-label{font-size:.82rem}
+      main{padding-top:48px}
+      .upload-panel{padding:20px}
+      .extraction-head,.field-top{display:block}
+      .document-tag{display:inline-block;margin-top:13px;white-space:normal}
+      .field-card{margin:0 18px 18px;padding:20px}
+      .field-state{margin-top:14px}
+      .field-actions{align-items:stretch;flex-direction:column-reverse}
+      .field-actions button{width:100%}
+      .upload-actions{align-items:stretch;flex-direction:column}
+    }
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#profile">Skip to profile</a>
+
+  <header class="site-header">
+    <div class="shell nav">
+      <a class="brand" href="#top" aria-label="RealDoor home">
+        <span class="door-mark" aria-hidden="true"></span>
+        <span class="brand-copy">
+          <span class="brand-name">RealDoor</span>
+          <span class="promise">A clearer path through housing paperwork.</span>
+        </span>
+      </a>
+      <button class="delete-session" id="deleteSession" type="button">Delete my session</button>
+    </div>
+    <div class="status-strip mono">Synthetic documents only · Nothing is sent for you · You confirm every field</div>
+  </header>
+
+  <div id="top" class="shell hero">
+    <div>
+      <p class="eyebrow mono">Your information · Your control</p>
+      <h1>Prepare with clarity. <em>Move at your pace.</em></h1>
+      <p class="lede">RealDoor helps you organize what you already have, understand the rules behind the numbers, and prepare a readiness packet you control.</p>
+      <p class="reassurance">You confirm every detail before it moves forward.</p>
+    </div>
+    <aside class="principles" aria-labelledby="principles-title">
+      <p class="mono panel-kicker">A careful boundary</p>
+      <h2 id="principles-title">Support without overstepping.</h2>
+      <div class="principle"><span class="principle-icon" aria-hidden="true">◇</span><div><b>AI extracts and explains</b><span>Every value and claim remains tied to its source.</span></div></div>
+      <div class="principle"><span class="principle-icon" aria-hidden="true">✓</span><div><b>You review and confirm</b><span>Nothing is reused before you say it is correct.</span></div></div>
+      <div class="principle"><span class="principle-icon" aria-hidden="true">⌂</span><div><b>A qualified person decides</b><span>RealDoor prepares information. It does not make housing decisions.</span></div></div>
+    </aside>
+  </div>
+
+  <nav class="progress-wrap" aria-label="Readiness stages">
+    <ol class="shell progress">
+      <li><button type="button" data-step="profile" aria-current="step"><span class="step-number">01</span><span class="step-label">Profile</span></button></li>
+      <li><button type="button" data-step="understand"><span class="step-number">02</span><span class="step-label">Understand</span></button></li>
+      <li><button type="button" data-step="prepare"><span class="step-number">03</span><span class="step-label">Prepare</span></button></li>
+      <li><button type="button" data-step="packet"><span class="step-number">04</span><span class="step-label">Packet</span></button></li>
+    </ol>
+  </nav>
+
+  <main id="profile" class="shell">
+    <section aria-labelledby="profile-title">
+      <div class="stage-heading">
+        <p class="stage-index mono">Stage 01 · Profile</p>
+        <div>
+          <h2 id="profile-title">Build a profile you trust.</h2>
+          <p>Add a synthetic pay stub or benefit letter. RealDoor shows where every value came from, then waits for your confirmation.</p>
+        </div>
+      </div>
+
+      <div class="workspace">
+        <section class="panel upload-panel" aria-labelledby="upload-title">
+          <p class="panel-kicker mono">Start with one document</p>
+          <h3 id="upload-title">Add a synthetic pay stub</h3>
+          <p class="upload-copy">For this preview, the sample file is ready. No file leaves this browser.</p>
+          <div class="upload-zone" id="uploadZone">
+            <div>
+              <span class="key-glyph" aria-hidden="true">⚿</span>
+              <p>Drop a synthetic document here</p>
+              <input id="fileInput" type="file" accept=".pdf,.png,.jpg,.jpeg" aria-label="Choose a synthetic document" aria-describedby="fileHelp" tabindex="-1">
+              <div class="upload-actions">
+                <button class="primary" id="chooseFile" type="button">Use Maria’s sample pay stub</button>
+                <button class="secondary" id="browseFile" type="button">Choose another file</button>
+              </div>
+              <small id="fileHelp">PDF, PNG, or JPG · Prototype uses mock data only</small>
+            </div>
+          </div>
+        </section>
+
+        <aside class="panel summary" aria-labelledby="summary-title">
+          <div class="summary-head">
+            <p class="mono">Live profile summary</p>
+            <h3 id="summary-title">Maria’s household</h3>
+          </div>
+          <div class="summary-body">
+            <div class="summary-row"><span>Household size</span><strong id="summaryHousehold">3 people</strong></div>
+            <div class="summary-row"><span>Monthly income</span><strong id="summaryMonthly">Not confirmed</strong></div>
+            <div class="annual">
+              <span class="mono">Annualized figure</span>
+              <output id="annualizedOutput" aria-live="polite">Waiting for confirmation</output>
+              <small>Monthly income × 12</small>
+            </div>
+            <p class="summary-note">This summary updates when you correct and confirm a field.</p>
+          </div>
+        </aside>
+
+        <section class="panel extraction" id="extractionPanel" aria-labelledby="extraction-title" hidden>
+          <div class="extraction-banner"><span aria-hidden="true">◆</span><span>Nothing here is reused until you confirm it.</span></div>
+          <div class="extraction-head">
+            <div>
+              <p class="panel-kicker mono">1 allowlisted field found</p>
+              <h3 id="extraction-title">Review the extracted value</h3>
+            </div>
+            <span class="document-tag mono" id="documentName">Maria_PayStub_April_2026.pdf</span>
+          </div>
+
+          <article class="field-card" aria-labelledby="income-label">
+            <div class="field-top">
+              <div>
+                <label class="field-label mono" id="income-label" for="monthlyIncome">Monthly gross income</label>
+                <div class="field-input-wrap">
+                  <span class="currency" aria-hidden="true">$</span>
+                  <input class="field-input" id="monthlyIncome" name="monthlyIncome" type="text" inputmode="decimal" autocomplete="off" aria-describedby="incomeError incomeSource incomeConfidence" value="3,240.00">
+                </div>
+                <p class="error" id="incomeError" role="alert" hidden>Please enter a monthly amount greater than zero.</p>
+              </div>
+              <p class="field-state" id="fieldState"><span class="field-state-icon" aria-hidden="true">○</span><span>Waiting for your confirmation</span></p>
+            </div>
+
+            <div class="evidence-grid">
+              <div class="source-box" id="incomeSource">
+                <span class="mono">Source · Quoted exactly</span>
+                <q id="sourceQuote">Gross pay this period: $1,620.00 · Pay frequency: Semi monthly</q>
+                <span class="source-coordinate mono">Maria sample pay stub · Earnings summary · Lines 08 and 09</span>
+              </div>
+              <div class="confidence" id="incomeConfidence">
+                <span class="mono">Extraction confidence</span>
+                <div class="confidence-line"><span>Confidence</span><strong>High · 94%</strong></div>
+                <div class="confidence-track" role="img" aria-label="High confidence, 94 percent"><span class="confidence-fill"></span></div>
+                <small>Confidence describes the extraction, not the person or their circumstances.</small>
+              </div>
+            </div>
+
+            <div class="field-actions">
+              <button class="text-control" id="correctField" type="button">Correct this field</button>
+              <button class="secondary" id="confirmField" type="button">Confirm this value</button>
+            </div>
+          </article>
+        </section>
+      </div>
+
+      <p class="checkpoint"><strong>Design checkpoint:</strong> This first pass intentionally stops after one extracted field so the visual direction can be confirmed before the rules, calculation, checklist, and packet stages are built.</p>
+    </section>
+  </main>
+
+  <div class="live-region" id="announcer" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    const mockProfile = {
+      person: {
+        name: "Maria Alvarez",
+        householdSize: 3,
+        fields: [
+          {
+            id: "monthlyIncome",
+            label: "Monthly gross income",
+            extractedValue: 3240,
+            value: 3240,
+            confirmed: false,
+            source: {
+              document: "Maria_PayStub_April_2026.pdf",
+              quote: "Gross pay this period: $1,620.00 · Pay frequency: Semi monthly",
+              coordinate: "Earnings summary · Lines 08 and 09"
+            },
+            confidence: { label: "High", percent: 94 }
+          }
+        ]
+      },
+      program: {
+        name: "Harbor View Homes · LIHTC",
+        ruleYear: 2026,
+        effectiveDate: "2026-04-01",
+        incomeLimit: { householdSize: 3, annualAmount: 74280 },
+        rules: [
+          {
+            question: "How is employment income annualized?",
+            answer: "Current gross pay is converted to a yearly figure using the documented pay frequency.",
+            source: "HUD Handbook 4350.3, Chapter 5",
+            effectiveDate: "2026-04-01"
+          },
+          {
+            question: "Does irregular overtime count?",
+            answer: "I’m not certain about this one. A qualified person should check it.",
+            abstain: true,
+            source: "Human review needed",
+            effectiveDate: "2026-04-01"
+          }
+        ]
+      },
+      checklist: [
+        { item: "Recent pay stub", status: "Present", date: "2026-04-30" },
+        { item: "Photo identification", status: "Missing", date: null },
+        { item: "Benefit letter", status: "Expired", date: "2026-03-01", note: "Benefit letter expired 03/2026, you will likely need a current one." }
+      ],
+      packet: { ready: false, sentByRealDoor: false }
+    };
+
+    const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
+    const extractionPanel = document.getElementById("extractionPanel");
+    const monthlyIncome = document.getElementById("monthlyIncome");
+    const incomeError = document.getElementById("incomeError");
+    const fieldState = document.getElementById("fieldState");
+    const summaryMonthly = document.getElementById("summaryMonthly");
+    const annualizedOutput = document.getElementById("annualizedOutput");
+    const announcer = document.getElementById("announcer");
+    const uploadZone = document.getElementById("uploadZone");
+
+    function announce(message) {
+      announcer.textContent = "";
+      window.setTimeout(function () { announcer.textContent = message; }, 40);
+    }
+
+    function parseAmount(value) {
+      return Number(value.replace(/[^0-9.]/g, ""));
+    }
+
+    function motionPreference() {
+      return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+    }
+
+    function revealExtraction(fileName) {
+      const field = mockProfile.person.fields[0];
+      field.value = field.extractedValue;
+      field.confirmed = false;
+      monthlyIncome.value = field.extractedValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      fieldState.classList.remove("is-confirmed");
+      fieldState.querySelector(".field-state-icon").textContent = "○";
+      fieldState.querySelector("span:last-child").textContent = "Waiting for your confirmation";
+      document.getElementById("summary-title").textContent = "Maria’s household";
+      document.getElementById("summaryHousehold").textContent = mockProfile.person.householdSize + " people";
+      extractionPanel.hidden = false;
+      if (fileName) document.getElementById("documentName").textContent = fileName;
+      extractionPanel.scrollIntoView({ behavior: motionPreference(), block: "start" });
+      announce("Synthetic document loaded. One field is ready for review.");
+    }
+
+    function resetFieldState() {
+      mockProfile.person.fields[0].confirmed = false;
+      fieldState.classList.remove("is-confirmed");
+      fieldState.querySelector(".field-state-icon").textContent = "○";
+      fieldState.querySelector("span:last-child").textContent = "Edited · confirmation needed";
+      summaryMonthly.textContent = "Not confirmed";
+      annualizedOutput.textContent = "Waiting for confirmation";
+    }
+
+    document.getElementById("chooseFile").addEventListener("click", function () { revealExtraction(mockProfile.person.fields[0].source.document); });
+    document.getElementById("browseFile").addEventListener("click", function () { document.getElementById("fileInput").click(); });
+    document.getElementById("fileInput").addEventListener("change", function (event) {
+      const selected = event.target.files[0];
+      revealExtraction(selected ? selected.name : mockProfile.person.fields[0].source.document);
+    });
+
+    ["dragenter", "dragover"].forEach(function (eventName) {
+      uploadZone.addEventListener(eventName, function (event) { event.preventDefault(); uploadZone.classList.add("is-dragging"); });
+    });
+    ["dragleave", "drop"].forEach(function (eventName) {
+      uploadZone.addEventListener(eventName, function (event) { event.preventDefault(); uploadZone.classList.remove("is-dragging"); });
+    });
+    uploadZone.addEventListener("drop", function (event) {
+      const selected = event.dataTransfer.files[0];
+      revealExtraction(selected ? selected.name : mockProfile.person.fields[0].source.document);
+    });
+
+    monthlyIncome.addEventListener("input", function () {
+      incomeError.hidden = true;
+      monthlyIncome.removeAttribute("aria-invalid");
+      resetFieldState();
+    });
+
+    document.getElementById("correctField").addEventListener("click", function () {
+      monthlyIncome.focus();
+      monthlyIncome.select();
+      announce("Monthly income field ready to correct.");
+    });
+
+    document.getElementById("confirmField").addEventListener("click", function () {
+      const value = parseAmount(monthlyIncome.value);
+      if (!Number.isFinite(value) || value <= 0) {
+        incomeError.hidden = false;
+        monthlyIncome.setAttribute("aria-invalid", "true");
+        monthlyIncome.focus();
+        announce("Please correct the monthly income amount.");
+        return;
+      }
+      mockProfile.person.fields[0].value = value;
+      mockProfile.person.fields[0].confirmed = true;
+      monthlyIncome.value = value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      fieldState.classList.add("is-confirmed");
+      fieldState.querySelector(".field-state-icon").textContent = "✓";
+      fieldState.querySelector("span:last-child").textContent = "Confirmed by you";
+      summaryMonthly.textContent = money.format(value);
+      annualizedOutput.textContent = money.format(value * 12);
+      announce("Field confirmed. Annualized figure updated.");
+    });
+
+    document.querySelectorAll("[data-step]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        if (button.dataset.step === "profile") {
+          document.getElementById("profile").scrollIntoView({ behavior: motionPreference() });
+          announce("Profile is the current stage.");
+        } else {
+          announce(button.textContent.trim() + " will be built after this visual direction is confirmed.");
+        }
+      });
+    });
+
+    document.getElementById("deleteSession").addEventListener("click", function () {
+      mockProfile.person.fields[0].value = null;
+      mockProfile.person.fields[0].confirmed = false;
+      monthlyIncome.value = "3,240.00";
+      incomeError.hidden = true;
+      monthlyIncome.removeAttribute("aria-invalid");
+      extractionPanel.hidden = true;
+      fieldState.classList.remove("is-confirmed");
+      fieldState.querySelector(".field-state-icon").textContent = "○";
+      fieldState.querySelector("span:last-child").textContent = "Waiting for your confirmation";
+      summaryMonthly.textContent = "Not confirmed";
+      annualizedOutput.textContent = "Waiting for confirmation";
+      document.getElementById("summary-title").textContent = "No profile loaded";
+      document.getElementById("summaryHousehold").textContent = "Not added";
+      document.getElementById("fileInput").value = "";
+      announce("Session deleted. All profile information has been cleared.");
+      document.getElementById("deleteSession").focus({ preventScroll: true });
+    });
+  </script>
+</body>
+</html>
