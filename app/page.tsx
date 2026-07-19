@@ -97,6 +97,7 @@ export default function Home() {
             <p className="program-note">
               RealDoor helps you gather and organize what this property needs.
               It does not decide if you qualify — a qualified person reviews your application.
+              This version focuses on one program to prove depth and correctness.
             </p>
           </div>
         </div>
