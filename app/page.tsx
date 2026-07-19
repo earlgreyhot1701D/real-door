@@ -59,7 +59,7 @@ export default function Home() {
           </button>
         </div>
         <div className="status-strip mono">
-          Synthetic documents only · Nothing is sent for you · You confirm every field
+          Demo mode · No real data is processed · Nothing is sent for you · You confirm every field
         </div>
       </header>
 

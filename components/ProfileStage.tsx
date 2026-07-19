@@ -36,7 +36,7 @@ export default function ProfileStage({ onIncomeConfirmed }: ProfileStageProps) {
     setConfirmedIncome(null);
     setIncomeConfirmed(false);
     setError(null);
-    announce("Synthetic document loaded. One field is ready for review.");
+    announce("Document loaded. One field is ready for review.");
     setTimeout(() => {
       extractionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 50);
@@ -115,7 +115,7 @@ export default function ProfileStage({ onIncomeConfirmed }: ProfileStageProps) {
         <div>
           <h2 id="profile-title">Build a profile you trust.</h2>
           <p>
-            Add a synthetic pay stub or benefit letter. RealDoor shows where every value came from,
+            Add a pay stub or benefit letter. RealDoor shows where every value came from,
             then waits for your confirmation.
           </p>
         </div>
@@ -125,7 +125,7 @@ export default function ProfileStage({ onIncomeConfirmed }: ProfileStageProps) {
         {/* Upload panel */}
         <section className="panel upload-panel" aria-labelledby="upload-title">
           <p className="panel-kicker mono">Start with one document</p>
-          <h3 id="upload-title">Add a synthetic pay stub</h3>
+          <h3 id="upload-title">Add a pay stub</h3>
           <p className="upload-copy">
             For this preview, the sample file is ready. No file leaves this browser.
           </p>
@@ -142,12 +142,12 @@ export default function ProfileStage({ onIncomeConfirmed }: ProfileStageProps) {
                 <p>Extracting fields…</p>
               ) : (
                 <>
-                  <p>Drop a synthetic document here</p>
+                  <p>Drop a document here</p>
                   <input
                     ref={fileInputRef}
                     type="file"
                     accept=".pdf,.png,.jpg,.jpeg,.txt"
-                    aria-label="Choose a synthetic document"
+                    aria-label="Choose a document"
                     aria-describedby="fileHelp"
                     style={{ position: "absolute", width: "1px", height: "1px", overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap", clipPath: "inset(50%)" }}
                     onChange={handleFileChange}
