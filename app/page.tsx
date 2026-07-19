@@ -86,6 +86,21 @@ export default function Home() {
       </nav>
 
       <main className="shell">
+        <div className="program-context">
+          <div className="program-context-inner">
+            <p className="mono panel-kicker">Preparing for</p>
+            <h3 className="program-name">Harbor View Homes · LIHTC</h3>
+            <p className="program-details">
+              Low-Income Housing Tax Credit program · 2026 income limits ·
+              Household of 3 · Annual limit: $74,280
+            </p>
+            <p className="program-note">
+              RealDoor helps you gather and organize what this property needs.
+              It does not decide if you qualify — a qualified person reviews your application.
+            </p>
+          </div>
+        </div>
+
         <ProfileStage onIncomeConfirmed={handleIncomeConfirmed} />
         <UnderstandStage
           monthlyIncome={confirmedIncome}
