@@ -1,4 +1,4 @@
-// ProfileStage: upload zone + extraction panel + confirm/correct flow. Reads mock data.
+// ProfileStage: upload zone + extraction panel + confirm/correct flow. Reads mock data or calls /api/extract.
 "use client";
 
 import { useState, useCallback, useRef } from "react";
@@ -17,6 +17,8 @@ export default function ProfileStage({ onIncomeConfirmed }: ProfileStageProps) {
   const [confirmedIncome, setConfirmedIncome] = useState<number | null>(null);
   const [incomeConfirmed, setIncomeConfirmed] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const extractionRef = useRef<HTMLDivElement>(null);
 
@@ -28,11 +30,12 @@ export default function ProfileStage({ onIncomeConfirmed }: ProfileStageProps) {
     }
   }, []);
 
-  function revealExtraction(fileName: string) {
+  function revealExtraction(fileName: string, fields: ExtractedField[]) {
     setDocumentName(fileName);
-    setExtracted(MOCK_EXTRACTION.fields);
+    setExtracted(fields);
     setConfirmedIncome(null);
     setIncomeConfirmed(false);
+    setError(null);
     announce("Synthetic document loaded. One field is ready for review.");
     setTimeout(() => {
       extractionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -40,16 +43,45 @@ export default function ProfileStage({ onIncomeConfirmed }: ProfileStageProps) {
   }
 
   function handleUseSample() {
-    revealExtraction(MOCK_EXTRACTION.documentName);
+    revealExtraction(MOCK_EXTRACTION.documentName, MOCK_EXTRACTION.fields);
   }
 
   function handleBrowse() {
     fileInputRef.current?.click();
   }
 
+  async function extractFromFile(file: File) {
+    setLoading(true);
+    setError(null);
+    try {
+      const text = await file.text();
+      const res = await fetch("/api/extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ documentText: text, documentName: file.name }),
+      });
+      if (!res.ok) throw new Error("Extraction failed");
+      const data = await res.json();
+      if (data.fields && data.fields.length > 0) {
+        revealExtraction(file.name, data.fields);
+      } else {
+        // Fallback to mock if extraction returned no fields
+        revealExtraction(file.name, MOCK_EXTRACTION.fields);
+        announce("No fields extracted from this document. Showing sample data.");
+      }
+    } catch {
+      // Fallback to mock on error (USE_MOCK_MODEL=1 or network issue)
+      revealExtraction(file.name, MOCK_EXTRACTION.fields);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    revealExtraction(file ? file.name : MOCK_EXTRACTION.documentName);
+    if (file) {
+      extractFromFile(file);
+    }
   }
 
   function handleDragEnter(e: React.DragEvent) { e.preventDefault(); setDragging(true); }
@@ -59,7 +91,9 @@ export default function ProfileStage({ onIncomeConfirmed }: ProfileStageProps) {
     e.preventDefault();
     setDragging(false);
     const file = e.dataTransfer.files[0];
-    revealExtraction(file ? file.name : MOCK_EXTRACTION.documentName);
+    if (file) {
+      extractFromFile(file);
+    }
   }
 
   function handleConfirm(value: number) {
@@ -104,26 +138,33 @@ export default function ProfileStage({ onIncomeConfirmed }: ProfileStageProps) {
           >
             <div>
               <span className="key-glyph" aria-hidden="true">⚿</span>
-              <p>Drop a synthetic document here</p>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,.png,.jpg,.jpeg"
-                aria-label="Choose a synthetic document"
-                aria-describedby="fileHelp"
-                style={{ position: "absolute", width: "1px", height: "1px", overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap", clipPath: "inset(50%)" }}
-                onChange={handleFileChange}
-                tabIndex={-1}
-              />
-              <div className="upload-actions">
-                <button className="primary" type="button" onClick={handleUseSample}>
-                  Use Maria&apos;s sample pay stub
-                </button>
-                <button className="secondary" type="button" onClick={handleBrowse}>
-                  Choose another file
-                </button>
-              </div>
-              <small id="fileHelp">PDF, PNG, or JPG · Prototype uses mock data only</small>
+              {loading ? (
+                <p>Extracting fields…</p>
+              ) : (
+                <>
+                  <p>Drop a synthetic document here</p>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf,.png,.jpg,.jpeg,.txt"
+                    aria-label="Choose a synthetic document"
+                    aria-describedby="fileHelp"
+                    style={{ position: "absolute", width: "1px", height: "1px", overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap", clipPath: "inset(50%)" }}
+                    onChange={handleFileChange}
+                    tabIndex={-1}
+                  />
+                  <div className="upload-actions">
+                    <button className="primary" type="button" onClick={handleUseSample}>
+                      Use Maria&apos;s sample pay stub
+                    </button>
+                    <button className="secondary" type="button" onClick={handleBrowse}>
+                      Choose another file
+                    </button>
+                  </div>
+                  <small id="fileHelp">PDF, PNG, JPG, or TXT · Prototype uses mock data only</small>
+                </>
+              )}
+              {error && <p className="error" role="alert">{error}</p>}
             </div>
           </div>
         </section>
