@@ -10,6 +10,8 @@ Built for Hack-Nation 6th Global AI Hackathon, Challenge 03 (RealDoor, powered b
 
 ## Architecture
 
+![RealDoor Architecture](public/images/architecture.png)
+
 ```
 ┌─────────────┐     ┌────────────────────────────────────────┐
 │   Browser   │────▶│  Next.js 14 App Router (Vercel/AWS)    │
